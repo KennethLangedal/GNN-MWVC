@@ -3,11 +3,18 @@
 cmake_minimum_required(VERSION 3.16)  
 project(GraphNeuralNetworks DESCRIPTION "GNN & MWVC" VERSION 0.0.1)
 
+# before executing do 
+# module load gcc/9.3.0
+# module load cmake/gcc/3.21.2
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_COMPILER gcc-9)
+set(CMAKE_CXX_COMPILER g++-9)
+set(CMAKE_CXX_FLAGS "-fopenmp")
 #set(CMAKE_CXX_FLAGS "-pg")
 
 find_package(OpenBLAS CONFIG REQUIRED)
+find_package(OpenMP)
 
 include_directories(include/gnn/)
 include_directories(include/mwvc/)
