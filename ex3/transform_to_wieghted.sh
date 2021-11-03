@@ -12,7 +12,7 @@ NC='\033[0m'
 PRE='weighted_'
 
 # transforms the graph
-function transform_graph() {
+function transform_graphs() {
     for path in $1/*.mtx; do
         local filename=$(basename $path)
         local new_filename="${PRE}${filename}"
@@ -28,6 +28,6 @@ tgt_folder=$2
 
 echo -e "${RED}$src_folder${NC} --> ${RED}$tgt_folder${NC}"
 
-transform_graph $src_folder $tgt_folder
+transform_graphs $src_folder $tgt_folder
 
 
