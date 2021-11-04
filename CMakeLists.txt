@@ -18,6 +18,12 @@ find_package(OpenMP)
 
 include_directories(include/gnn/)
 include_directories(include/mwvc/)
+include_directories(include/mtx/)
+
+add_library(mmio src/mtx/mmio.c)
+
+add_executable(example_read src/mtx/example_read.c)
+target_link_libraries(example_read mmio)
 
 add_executable(gen_weights src/apps/gen_weights.cpp)
 
