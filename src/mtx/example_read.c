@@ -69,6 +69,10 @@ int main(int argc, char *argv[])
     if ((ret_code = mm_read_mtx_crd_size(f, &M, &N, &nz)) !=0)
         exit(1);
 
+    printf("M %i  \n", M); 
+    printf("N %i  \n", N); 
+    printf("nz %i \n", nz); 
+
 
     /* reseve memory for matrices */
 
