@@ -11,7 +11,6 @@ NC='\033[0m'
 # Prefix
 PRE='weighted_'
 
-
 # transforms the graph
 function transform_graphs() {
     for path in $1/*.mtx; do
