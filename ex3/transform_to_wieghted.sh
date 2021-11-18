@@ -11,6 +11,7 @@ NC='\033[0m'
 # Prefix
 PRE='weighted_'
 
+
 # transforms the graph
 function transform_graphs() {
     for path in $1/*.mtx; do
@@ -18,7 +19,8 @@ function transform_graphs() {
         local new_filename="${PRE}${filename}"
         local new_path="$2${new_filename}"
         echo -e "${RED}$path${NC} --> $new_path"
-        ../build/gen_weights < $path > $new_path
+        #  "Usage: ./gen_weights [graph] [output graph] [min] [max] [seed]"
+        ../build/gen_weights $path $new_path 20 120 -1
     done
 }
 
