@@ -2,20 +2,22 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <random>
 
 using namespace std;
 
 using Tn = uint32_t;
-using Tw = float;
+using Tw = uint32_t;
+
+float WEIGHT_SCALE = 1200.0f;
 
 reduction_graph<Tn, Tw> parse_graph(ifstream &fs) {
     uint64_t E, N;
     fs >> E >> N;
     vector<Tw> weights(N);
-    for (auto &&w : weights) {
+    for (auto &&w : weights)
         fs >> w;
-        w /= 120.0f;
-    }
+
     vector<pair<Tn, Tn>> edges(E);
     for (auto &&[u, v] : edges) {
         fs >> u >> v;
@@ -36,7 +38,7 @@ vector<pair<pair<matrix, reduction_graph<Tn, Tw>>, matrix>> load_data(filesystem
         auto &&g = parse_graph(fs_g);
         matrix x(g.size(), 1);
         for (Tn u = 0; u < g.size(); ++u) {
-            x(u, 0) = g.W(u);
+            x(u, 0) = (float)g.W(u) / WEIGHT_SCALE;
         }
         ifstream fs_l(graph_entry.path());
         matrix y(g.size(), 1);
@@ -45,7 +47,7 @@ vector<pair<pair<matrix, reduction_graph<Tn, Tw>>, matrix>> load_data(filesystem
             fs_l >> v;
             y(u, 0) = v;
         }
-        
+
         res.push_back({{x, g}, y});
     }
     return res;
@@ -56,17 +58,19 @@ struct performance {
 };
 
 ostream &operator<<(ostream &os, const performance &p) {
-    os << setw(7) << setfill('0') << p.loss << "\t" << setw(7) << setfill('0') << p.total_accuracy * 100.0f << "\t" << setw(7) << setfill('0') << (size_t)p.num_total << "\t" << setw(7) << setfill('0') << p.true_accuracy * 100.0f << "\t" << setw(7) << setfill('0') << (size_t)p.num_true << "\t";
+    os << setw(7) << setfill('0') << p.loss << "\t\t" << setw(7) << setfill('0') << p.total_accuracy * 100.0f << "\t\t" << setw(7) << setfill('0') << (size_t)p.num_total << "\t\t" << setw(7) << setfill('0') << p.true_accuracy * 100.0f << "\t\t" << setw(7) << setfill('0') << (size_t)p.num_true << "\t\t";
     return os;
 }
 
 template <typename It>
-performance run_model(gnn::model_training &m, It first, It last, bool fit = false) {
+performance run_model(gnn::model_training &m, It first, It last, bool fit = false, size_t batch_size = 10000, float lr = 0.1f, float momentum = 0.9f, float wd = 0.0000f) {
     performance res;
+    int t = 0;
+    matrix out, grad;
     while (first != last) {
         auto &&[x, g] = first->first;
         auto &&y = first->second;
-        auto &&out = m.predict(x, g);
+        m.predict(x, out, g);
         for (int i = 0; i < out.get_height(); i++) {
             if (y(i, 0) > 0.5f) {
                 res.num_true += 1.0f;
@@ -79,12 +83,20 @@ performance run_model(gnn::model_training &m, It first, It last, bool fit = fals
         res.loss += gnn::MSE_loss(out, y) * y.get_height();
         res.num_total += y.get_height();
         if (fit) {
-            auto &&grad = gnn::MSE_grad(out, y);
-            m.backprop(grad, g);
-            gnn::SGD_step(m, 0.05f, 0.9f, 0.00001f);
-            gnn::zero_grad(m);
+            gnn::MSE_grad(out, y, grad);
+            m.backprop(grad, out, g);
+            if (t > batch_size) {
+                gnn::SGD_step(m, t, lr, momentum, wd);
+                gnn::zero_grad(m);
+                t = 0;
+            } else
+                t += x.get_height();
         }
         ++first;
+    }
+    if (t > 0) {
+        gnn::SGD_step(m, t, lr, momentum, wd);
+        gnn::zero_grad(m);
     }
     res.loss /= res.num_total;
     res.total_accuracy = (res.true_accuracy + res.total_accuracy) / res.num_total;
@@ -92,37 +104,43 @@ performance run_model(gnn::model_training &m, It first, It last, bool fit = fals
     return res;
 }
 
-int main() {
+int main(int narg, char **arg) {
+    if (narg != 7) {
+        cout << "Usage: ./gnn_train [graph path] [train labels] [test labels] [out path] [number of epochs] [seed]" << endl;
+        return 0;
+    }
 
-    gnn::model_training m("Pure_model");
-    size_t seed = 4;
-    m.add_layer(gnn::graph_layer_training());
-    m.add_layer(gnn::linear_layer_training(5, 16, seed));
+    string graph_path(arg[1]), train_label_path(arg[2]), test_label_path(arg[3]), out_path(arg[4]);
+    size_t ne = stoi(arg[5]);
+    ofstream os(out_path);
+    if (!os.is_open()) {
+        cout << "Unable to open file at out path" << endl;
+        return 0;
+    }
+
+    gnn::model_training m("MWVC_Model");
+    size_t seed = stoi(arg[6]);
+    m.add_layer(gnn::graph_layer_training(WEIGHT_SCALE));
+    m.add_layer(gnn::linear_layer_training(5, 32, seed++));
     m.add_layer(gnn::ReLU_training());
-    m.add_layer(gnn::linear_layer_training(16, 16, seed));
+    m.add_layer(gnn::linear_layer_training(32, 32, seed++));
     m.add_layer(gnn::ReLU_training());
-    m.add_layer(gnn::linear_layer_training(16, 8, seed));
+    m.add_layer(gnn::linear_layer_training(32, 16, seed++));
     m.add_layer(gnn::ReLU_training());
-    m.add_layer(gnn::graph_layer_training());
-    m.add_layer(gnn::linear_layer_training(19, 12, seed));
+    m.add_layer(gnn::graph_layer_training(WEIGHT_SCALE));
+    m.add_layer(gnn::linear_layer_training(35, 32, seed++));
     m.add_layer(gnn::ReLU_training());
-    m.add_layer(gnn::linear_layer_training(12, 12, seed));
+    m.add_layer(gnn::linear_layer_training(32, 32, seed++));
     m.add_layer(gnn::ReLU_training());
-    m.add_layer(gnn::linear_layer_training(12, 8, seed));
+    m.add_layer(gnn::linear_layer_training(32, 16, seed++));
     m.add_layer(gnn::ReLU_training());
-    m.add_layer(gnn::graph_layer_training());
-    m.add_layer(gnn::linear_layer_training(19, 12, seed));
+    m.add_layer(gnn::graph_layer_training(WEIGHT_SCALE));
+    m.add_layer(gnn::linear_layer_training(35, 32, seed++));
     m.add_layer(gnn::ReLU_training());
-    m.add_layer(gnn::linear_layer_training(12, 8, seed));
+    m.add_layer(gnn::linear_layer_training(32, 16, seed++));
     m.add_layer(gnn::ReLU_training());
-    m.add_layer(gnn::linear_layer_training(8, 1, seed));
+    m.add_layer(gnn::linear_layer_training(16, 1, seed++));
     m.add_layer(gnn::sigmoid_training());
-
-    string graph_path, train_label_path, test_label_path;
-    cin >> graph_path >> train_label_path >> test_label_path;
-
-    int ne;
-    cin >> ne;
 
     cout << fixed << setprecision(4);
 
@@ -131,17 +149,18 @@ int main() {
     cout << "Test data: " << endl;
     auto &&test_data = load_data(graph_path, test_label_path);
 
-
     cout << "Epoch\tLoss\t\tAccuracy\tTotal\t\tTrue accuracy\tTrue total\tTest loss\tTest accuracy\tTest total\tTest true acc\tTest true total" << endl;
 
+    mt19937 reng(seed);
     for (int e = 0; e <= ne; e++) {
+        shuffle(begin(train_data), end(train_data), reng);
         auto p_train = run_model(m, begin(train_data), end(train_data), true);
         auto p_test = run_model(m, begin(test_data), end(test_data), false);
         if (e % 1 == 0)
             cout << e << "\t" << p_train << p_test << endl;
     }
 
-    cout << m;
+    os << m;
 
     return 0;
 }

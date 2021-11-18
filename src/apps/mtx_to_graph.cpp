@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <random>
 #include <sstream>
@@ -6,35 +7,47 @@
 
 using namespace std;
 
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
+int main(int narg, char **arg) {
+    if (narg != 3) {
+        cout << "Usage: ./mtx_to_graph [graph] [output graph]" << endl;
+        return 0;
+    }
+
+    string in_path(arg[1]), out_path(arg[2]);
+
+    ifstream is(in_path);
+    ofstream os(out_path);
+
+    if (!is.is_open() || !os.is_open()) {
+        cout << "Error opening files" << endl;
+        return 0;
+    }
 
     size_t N, E, w, u, v;
 
-    cin >> E >> N;
+    is >> E >> N;
 
     vector<uint32_t> weights(N);
-    vector<vector<uint32_t>> edges(E);
+    vector<vector<uint32_t>> edges(N);
 
     for (size_t i = 0; i < N; ++i) {
-        cin >> weights[i];
+        is >> weights[i];
     }
     for (size_t i = 0; i < E; ++i) {
-        cin >> u >> v;
+        is >> u >> v;
         edges[u - 1].push_back(v);
         edges[v - 1].push_back(u);
     }
     for (size_t i = 0; i < N; ++i) {
         sort(begin(edges[i]), end(edges[i]));
     }
-    cout << N << " " << E << " 10" << endl;
+    os << N << " " << E << " 10" << endl;
     for (size_t i = 0; i < N; ++i) {
-        cout << weights[i] << " ";
+        os << weights[i] << " ";
         for (size_t j = 0; j < edges[i].size(); ++j) {
-            cout << edges[i][j] << " ";
+            os << edges[i][j] << " ";
         }
-        cout << endl;
+        os << endl;
     }
     return 0;
 }

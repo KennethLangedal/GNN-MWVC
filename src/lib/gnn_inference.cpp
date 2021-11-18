@@ -6,8 +6,8 @@ using namespace gnn;
 
 linear_layer::linear_layer(size_t dim_in, size_t dim_out, size_t seed)
     : W(dim_in, dim_out), bias(1, dim_out) {
-    Tw lim = 1.0 / sqrt(dim_in + 1);
-    std::uniform_real_distribution<Tw> dist(-lim, lim);
+    float lim = 1.0 / sqrt(dim_in + 1);
+    std::uniform_real_distribution<float> dist(-lim, lim);
     std::mt19937 gen(seed);
     for (auto &&w : W.raw()) {
         w = dist(gen);
@@ -17,15 +17,14 @@ linear_layer::linear_layer(size_t dim_in, size_t dim_out, size_t seed)
     }
 }
 
-const matrix &linear_layer::forward(const matrix &in) const {
+void linear_layer::forward(const matrix &in, matrix &out) const {
     dot(in, W, out, false, false, 0.0f);
     for (size_t i = 0; i < out.get_height(); i++) {
         std::transform(std::begin(out[i]), std::end(out[i]), std::begin(bias.raw()), std::begin(out[i]), std::plus());
     }
-    return out;
 }
 
-const matrix &graph_layer::forward(const matrix &in, const reduction_graph<Tn, Tw> &g) const {
+void graph_layer::forward(const matrix &in, matrix &out, const reduction_graph<Tn, Tw> &g) const {
     out.resize(in.get_height(), (in.get_width() * 2) + 3);
     std::fill(std::begin(out.raw()), std::end(out.raw()), 0.0);
 
@@ -34,23 +33,20 @@ const matrix &graph_layer::forward(const matrix &in, const reduction_graph<Tn, T
             std::transform(std::begin(in[v]), std::end(in[v]), std::begin(out[u]), std::begin(out[u]), std::plus());
         }
         std::copy(std::begin(in[u]), std::end(in[u]), std::begin(out[u]) + in.get_width());
-        *(std::begin(out[u]) + in.get_width() + 1) = (Tw)g.D(u) / (Tw)g.size();
-        *(std::begin(out[u]) + in.get_width() + 2) = g.W(u);
-        *(std::begin(out[u]) + in.get_width() + 3) = g.NW(u);
+        *(std::begin(out[u]) + in.get_width() + 1) = (float)g.D(u);
+        *(std::begin(out[u]) + in.get_width() + 2) = (float)g.W(u) / WEIGHT_SCALE;
+        *(std::begin(out[u]) + in.get_width() + 3) = (float)g.NW(u) / WEIGHT_SCALE;
     }
-    return out;
 }
 
-const matrix &ReLU::forward(const matrix &in) const {
+void ReLU::forward(const matrix &in, matrix &out) const {
     out.resize(in.get_height(), in.get_width());
     std::transform(std::begin(in.raw()), std::end(in.raw()), std::begin(out.raw()), [](auto &&x) { return std::max(x, 0.0f); });
-    return out;
 }
 
-const matrix &sigmoid::forward(const matrix &in) const {
+void sigmoid::forward(const matrix &in, matrix &out) const {
     out.resize(in.get_height(), in.get_width());
     std::transform(std::begin(in.raw()), std::end(in.raw()), std::begin(out.raw()), [](auto &&x) { return 1.0f / (1.0f + expf(-x)); });
-    return out;
 }
 
 model::model(std::string name) : name(name) {
@@ -66,21 +62,20 @@ struct overloaded : Ts... { using Ts::operator()...; };
 template <class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
 
-const matrix &model::predict(const matrix &in, const reduction_graph<Tn, Tw> &g) const {
+void model::predict(const matrix &in, matrix &out, const reduction_graph<Tn, Tw> &g) const {
     assert(!layers.empty());
 
-    std::visit(overloaded{
-                   [&](auto &&l) { l.forward(in); },
-                   [&](const graph_layer &l) { l.forward(in, g); }},
-               layers.front());
+    in_copy.resize(in.get_height(), in.get_width());
+    std::copy(std::begin(in.raw()), std::end(in.raw()), std::begin(in_copy.raw()));
 
-    for (size_t i = 1; i < layers.size(); i++)
+    for (auto &&l : layers) {
         std::visit(overloaded{
-                       [&](auto &&l, auto &&prev) { l.forward(prev.out); },
-                       [&](const graph_layer &l, auto &&prev) { l.forward(prev.out, g); }},
-                   layers[i], layers[i - 1]);
-
-    return std::visit([](auto &&l) -> const matrix & { return l.out; }, layers.back());
+                       [&](auto &&l) { l.forward(in_copy, out); },
+                       [&](const graph_layer &l) { l.forward(in_copy, out, g); }},
+                   l);
+        std::swap(in_copy, out);
+    }
+    std::swap(in_copy, out);
 }
 
 std::ostream &gnn::operator<<(std::ostream &os, const model &m) {

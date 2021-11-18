@@ -5,39 +5,39 @@ namespace gnn {
     struct linear_layer_training {
         linear_layer l;
 
-        mutable matrix in_copy, grad_out, grad_W, grad_bias, vel_W, vel_bias;
+        mutable matrix in_copy, grad_W, grad_bias, vel_W, vel_bias;
 
         linear_layer_training(size_t dim_in = 0, size_t dim_out = 0, size_t seed = 0);
 
-        const matrix &forward(const matrix &in) const;
-        const matrix &backward(const matrix &grad_in) const;
+        void forward(const matrix &in, matrix &out) const;
+        void backward(const matrix &grad_in, matrix &grad_out) const;
     };
 
     struct graph_layer_training {
         graph_layer l;
 
-        mutable matrix grad_out;
+        graph_layer_training(float WEIGHT_SCALE = 1200.0f) { l.WEIGHT_SCALE = WEIGHT_SCALE; }
 
-        const matrix &forward(const matrix &in, const reduction_graph<Tn, Tw> &g) const;
-        const matrix &backward(const matrix &grad_in, const reduction_graph<Tn, Tw> &g) const;
+        void forward(const matrix &in, matrix &out, const reduction_graph<Tn, Tw> &g) const;
+        void backward(const matrix &grad_in, matrix &grad_out, const reduction_graph<Tn, Tw> &g) const;
     };
 
     struct ReLU_training {
         ReLU l;
 
-        mutable matrix in_copy, grad_out;
+        mutable matrix in_copy;
 
-        const matrix &forward(const matrix &in) const;
-        const matrix &backward(const matrix &grad_in) const;
+        void forward(const matrix &in, matrix &out) const;
+        void backward(const matrix &grad_in, matrix &grad_out) const;
     };
 
     struct sigmoid_training {
         sigmoid l;
 
-        mutable matrix in_copy, grad_out;
+        mutable matrix in_copy;
 
-        const matrix &forward(const matrix &in) const;
-        const matrix &backward(const matrix &grad_in) const;
+        void forward(const matrix &in, matrix &out) const;
+        void backward(const matrix &grad_in, matrix &grad_out) const;
     };
 
     using component_training = std::variant<linear_layer_training, graph_layer_training, ReLU_training, sigmoid_training>;
@@ -45,13 +45,14 @@ namespace gnn {
     struct model_training {
         std::string name;
         std::vector<component_training> layers;
+        mutable matrix in_copy;
 
         model_training(std::string name = "");
 
         void add_layer(const component_training &c);
 
-        const matrix &predict(const matrix &in, const reduction_graph<Tn, Tw> &g) const;
-        const matrix &backprop(const matrix &grad_in, const reduction_graph<Tn, Tw> &g) const;
+        void predict(const matrix &in, matrix &out, const reduction_graph<Tn, Tw> &g) const;
+        void backprop(const matrix &grad_in, matrix &grad_out, const reduction_graph<Tn, Tw> &g) const;
 
         friend std::ostream &operator<<(std::ostream &os, const model_training &m);
         friend std::istream &operator>>(std::istream &is, model_training &m);
@@ -60,9 +61,9 @@ namespace gnn {
     std::ostream &operator<<(std::ostream &os, const model_training &m);
     std::istream &operator>>(std::istream &is, model_training &m);
 
-    Tw MSE_loss(const matrix &x, const matrix &y);
-    matrix MSE_grad(const matrix &x, const matrix &y);
+    float MSE_loss(const matrix &x, const matrix &y);
+    void MSE_grad(const matrix &x, const matrix &y, matrix &grad_out);
 
-    void SGD_step(model_training &m, float lr = 0.1, float momentum = 0.9, float weight_decay = 0);
+    void SGD_step(model_training &m, size_t batch_size, float lr = 0.1, float momentum = 0.9, float weight_decay = 0);
     void zero_grad(model_training &m);
 }

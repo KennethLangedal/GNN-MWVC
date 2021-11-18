@@ -1,6 +1,7 @@
 #pragma once
 #include "flow_graph.hpp"
 #include "reduction_graph.hpp"
+#include "small_solve.hpp"
 #include <bitset>
 #include <optional>
 
@@ -8,6 +9,7 @@ template <typename Tn, typename Tw>
 struct vertex_cover {
     std::vector<std::optional<bool>> S;
     Tw cost = 0;
+    size_t r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0, r6 = 0, r7 = 0, r8 = 0;
     vertex_cover(Tn N) : S(N, std::nullopt) {}
 
     void extend_to_new_node() {
@@ -15,25 +17,28 @@ struct vertex_cover {
     }
 };
 
-size_t num_local_reduction_rules = 7;
-constexpr size_t max_small_solve = 6;
+constexpr size_t max_small_solve = 12;
 
 enum class reduction_rules { neighborhood_reduction,
-                             domination_reduction,
                              twin_fold,
+                             domination_reduction,
                              isolated_fold,
-                             neighborhood_meta,
-                             neighbor_reduction,
                              independent_fold,
-                             critical_weight_reduction };
+                             neighbor_meta_reduction,
+                             neighborhood_meta_reduction,
+                             critical_weight_reduction
+};
 
 template <typename Tn>
 struct graph_search {
     std::vector<std::vector<bool>> visited;
     std::vector<std::stack<Tn>> search;
+    small_mwvc_solver sms;
 
-    graph_search(Tn N)
-        : visited(num_local_reduction_rules, std::vector<bool>(N, false)), search(num_local_reduction_rules) {
+    size_t num_local_reduction_rules = 7;
+
+    graph_search(Tn N, size_t rules = 7)
+        : visited(rules, std::vector<bool>(N, false)), search(rules), num_local_reduction_rules(rules) {
         for (size_t r = 0; r < num_local_reduction_rules; r++)
             for (Tn u = 0; u < N; u++)
                 search[r].push(u);
@@ -68,19 +73,19 @@ void unfold_graph(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_se
     while (g.get_timestamp() > t) {
         auto [t, u, v] = g.actions_top();
         if (t == action::twin_fold) {
-            assert(vc.S[u].has_value() && !vc.S[v].has_value());
-            vc.S[v] = vc.S[u];
+            assert(vc.S[g.get_org_label(u)].has_value() && !vc.S[g.get_org_label(v)].has_value());
+            vc.S[g.get_org_label(v)] = vc.S[g.get_org_label(u)];
         } else if (t == action::isolated_fold) {
-            assert(!vc.S[u].has_value());
-            vc.S[u] = std::any_of(std::begin(g[u]), std::end(g[u]), [&](auto w) { return !*vc.S[w]; });
+            assert(!vc.S[g.get_org_label(u)].has_value());
+            vc.S[g.get_org_label(u)] = std::any_of(std::begin(g[u]), std::end(g[u]), [&](auto w) { return !*vc.S[g.get_org_label(w)]; });
         } else if (t == action::neighborhood_fold) {
-            assert(v == vc.S.size() - 1 && vc.S[v].has_value());
-            vc.S[u] = !*vc.S[v];
+            assert(g.get_org_label(v) == vc.S.size() - 1 && vc.S[g.get_org_label(v)].has_value());
+            vc.S[g.get_org_label(u)] = !*vc.S[g.get_org_label(v)];
             for (auto &&w : g[u]) {
-                vc.S[w] = *vc.S[v];
+                vc.S[g.get_org_label(w)] = *vc.S[g.get_org_label(v)];
             }
             vc.S.pop_back();
-            for (size_t r = 0; r < num_local_reduction_rules; r++) {
+            for (size_t r = 0; r < gs.num_local_reduction_rules; r++) {
                 gs.visited[r].pop_back();
             }
         }
@@ -90,11 +95,13 @@ void unfold_graph(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_se
 
 template <typename Tn, typename Tw>
 void select_neighborhood(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_search<Tn> &gs, Tn u) {
-    assert(vc.S[u] == std::nullopt);
-    vc.S[u] = false;
+    Tn u_org = g.get_org_label(u), v_org;
+    assert(vc.S[u_org] == std::nullopt);
+    vc.S[u_org] = false;
     for (auto &&v : g[u]) {
-        assert(vc.S[v] == std::nullopt);
-        vc.S[v] = true;
+        v_org = g.get_org_label(v);
+        assert(vc.S[v_org] == std::nullopt);
+        vc.S[v_org] = true;
         vc.cost += g.W(v);
     }
 
@@ -108,8 +115,9 @@ void select_neighborhood(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, g
 
 template <typename Tn, typename Tw>
 void select_node(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_search<Tn> &gs, Tn u) {
-    assert(vc.S[u] == std::nullopt);
-    vc.S[u] = true;
+    Tn u_org = g.get_org_label(u);
+    assert(vc.S[u_org] == std::nullopt);
+    vc.S[u_org] = true;
     vc.cost += g.W(u);
     for (auto &&v : g[u])
         gs.push_search(v);
@@ -119,6 +127,7 @@ void select_node(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_sea
 template <typename Tn, typename Tw>
 bool neighborhood_reduction(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_search<Tn> &gs, Tn u) {
     if (g.NW(u) <= g.W(u)) {
+        vc.r1 += g.D(u) + 1;
         select_neighborhood(g, vc, gs, u);
         return true;
     }
@@ -132,12 +141,15 @@ bool twin_fold(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_searc
     bool found = false;
     for (auto &&v : g[first_neighbor]) {
         if (v != u && g.is_twin(u, v)) {
+            vc.r2 += 1;
             g.fold_twin(u, v);
             found = true;
         }
     }
     if (found) {
         gs.push_search(u);
+        for (auto &&v : g[u])
+            gs.push_search(v);
         return true;
     }
     return false;
@@ -146,7 +158,13 @@ bool twin_fold(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_searc
 template <typename Tn, typename Tw>
 bool domination_reduction(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_search<Tn> &gs, Tn u) {
     for (auto &&v : g[u]) {
+        if (g.W(v) >= g.W(u) && g.is_dominating(u, v)) {
+            vc.r3 += 1;
+            select_node(g, vc, gs, u);
+            return true;
+        }
         if (g.W(v) <= g.W(u) && g.is_dominating(v, u)) {
+            vc.r3 += 1;
             select_node(g, vc, gs, v);
             return true;
         }
@@ -179,64 +197,27 @@ void neighborhood_difference(const reduction_graph<Tn, Tw> &g, Tn u, Tn v, It re
     std::copy(f1, l1, res);
 }
 
-template <typename Tn, typename Tw, typename It>
-Tw small_solve_wvc(const reduction_graph<Tn, Tw> &g, It first, It last) {
-    assert(std::distance(first, last) <= max_small_solve);
-    std::array<uint8_t, max_small_solve> sg = {};
-    std::array<Tw, max_small_solve> w = {};
-    size_t i = 0, j, ne = 0;
-    for (auto it = first; it != last; ++it) {
-        Tn u = *it;
-        w[i] = g.W(u);
-        j = 0;
-        for (auto it2 = first; it2 != last; ++it2) {
-            Tn v = *it2;
-            if (v != u && std::binary_search(std::begin(g[u]), std::end(g[u]), v)) {
-                ne++;
-                sg[i] |= 1 << j;
-            }
-            ++j;
-        }
-        ++i;
-    }
-    if (ne == 0)
-        return 0;
-
-    auto &&valid = [&](uint8_t s) {
-        for (uint8_t i = 0; i < max_small_solve; ++i) {
-            if ((s & sg[i]) != sg[i] && (s & (1 << i)) == 0)
-                return false;
-        }
-        return true;
-    };
-    auto &&cost = [&](uint8_t s) {
-        Tw c = 0;
-        for (uint8_t i = 0; i < max_small_solve; ++i) {
-            if (((1 << i) & s) > 0)
-                c += w[i];
-        }
-        return c;
-    };
-    Tw res = std::numeric_limits<Tw>::max();
-    for (uint16_t s = 0; s < (1 << max_small_solve); ++s) {
-        if (valid(s))
-            res = std::min(res, cost(s));
-    }
-    return res;
-}
-
 template <typename Tn, typename Tw>
-bool neighbor_reduction(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_search<Tn> &gs, Tn u) {
+bool neighbor_meta_reduction(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_search<Tn> &gs, Tn u) {
     std::vector<Tn> tmp;
     for (auto &&v : g[u]) {
         if (g.W(v) <= g.W(u) || (g.D(v) > g.D(u) && g.D(v) - g.D(u) > max_small_solve))
             continue;
         neighborhood_difference(g, v, u, std::back_inserter(tmp), max_small_solve);
         if (tmp.size() <= max_small_solve) {
-            Tw C = 0, VC = small_solve_wvc(g, std::begin(tmp), std::end(tmp));
+            gs.sms.reset();
+            for (auto &&_u : tmp) {
+                gs.sms.add_node(_u, g.W(_u));
+                for (auto &&_v : g[_u]) {
+                    gs.sms.add_edge(_u, _v);
+                }
+            }
+
+            Tw C = 0, VC = gs.sms.solve();
             for (auto &&w : tmp)
                 C += g.W(w);
             if (C - VC + g.W(u) <= g.W(v)) {
+                vc.r4 += 1;
                 select_node(g, vc, gs, u);
                 return true;
             }
@@ -247,8 +228,19 @@ bool neighbor_reduction(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, gr
 }
 
 template <typename Tn, typename Tw>
-bool neighborhood_meta(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_search<Tn> &gs, Tn u) {
-    if (g.D(u) <= max_small_solve && g.W(u) >= g.NW(u) - small_solve_wvc(g, std::begin(g[u]), std::end(g[u]))) {
+bool neighborhood_meta_reduction(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_search<Tn> &gs, Tn u) {
+    if (g.D(u) > max_small_solve)
+        return false;
+
+    gs.sms.reset();
+    for (auto &&v : g[u]) {
+        gs.sms.add_node(v, g.W(v));
+        for (auto &&w : g[v])
+            gs.sms.add_edge(v, w);
+    }
+
+    if (g.W(u) >= g.NW(u) - gs.sms.solve()) {
+        vc.r5 += g.D(u) + 1;
         select_neighborhood(g, vc, gs, u);
         return true;
     }
@@ -261,6 +253,7 @@ bool independent_fold(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, grap
     Tn min_neighbor = *std::min_element(std::begin(g[u]), std::end(g[u]), [&](auto &&a, auto &&b) { return g.W(a) < g.W(b); });
     if (g.W(u) >= g.NW(u) - g.W(min_neighbor)) {
         if (g.has_independent_neighbors(u)) { // could be u and none of N(u)
+            vc.r6 += g.D(u);
             vc.cost += g.W(u);
             g.fold_neighborhood(u);
             gs.extend_to_new_node(g.size() - 1);
@@ -268,6 +261,7 @@ bool independent_fold(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, grap
             for (auto &&v : g[g.size() - 1])
                 gs.push_search(v);
         } else { // we need at least one neighbor, can always choose neighborhood
+            vc.r6 += g.D(u) + 1;
             select_neighborhood(g, vc, gs, u);
         }
         return true;
@@ -281,9 +275,11 @@ bool isolated_fold(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_s
         vc.cost += g.W(u) * g.D(u); // we will exclude exactly 1 node from this clique
         g.fold_isolated(u);
         for (auto &&v : g[u]) {
+            gs.push_search(v);
             for (auto &&w : g[v])
                 gs.push_search(w);
         }
+        vc.r7 += 1;
         return true;
     }
     return false;
@@ -323,6 +319,7 @@ bool reduction_critial_weight(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &
         }
     }
     for (auto &&u : rn) {
+        vc.r8 += g.D(u) + 1;
         select_neighborhood(g, vc, gs, u);
     }
     return res;
@@ -333,20 +330,20 @@ void reduce_graph(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_se
     bool critical = false;
     do {
         size_t rule = 0;
-        while (rule < num_local_reduction_rules) {
+        while (rule < gs.num_local_reduction_rules) {
             if (gs.search[rule].empty()) {
                 rule++;
             } else {
                 Tn u = gs.pop_search(rule);
-                if (!g.is_active(u))
+                if (u >= g.size() || !g.is_active(u))
                     continue;
                 bool found = false;
                 switch ((reduction_rules)rule) {
                 case reduction_rules::neighborhood_reduction:
                     found = neighborhood_reduction(g, vc, gs, u);
                     break;
-                case reduction_rules::neighborhood_meta:
-                    found = neighborhood_meta(g, vc, gs, u);
+                case reduction_rules::neighborhood_meta_reduction:
+                    found = neighborhood_meta_reduction(g, vc, gs, u);
                     break;
                 case reduction_rules::twin_fold:
                     found = twin_fold(g, vc, gs, u);
@@ -360,8 +357,8 @@ void reduce_graph(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_se
                 case reduction_rules::isolated_fold:
                     found = isolated_fold(g, vc, gs, u);
                     break;
-                case reduction_rules::neighbor_reduction:
-                    found = neighbor_reduction(g, vc, gs, u);
+                case reduction_rules::neighbor_meta_reduction:
+                    found = neighbor_meta_reduction(g, vc, gs, u);
                     break;
 
                 default:
