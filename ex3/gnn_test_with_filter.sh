@@ -2,6 +2,11 @@
 #
 # This script runs the gnn_test over a subset of suitsparse.
 #
+# tmux new -s newSessionName    === create a new session
+# tmux a -t newSessionName      === connect tosession 
+# ctr + b , d                   === disconnect from session
+# srun -p defq --exclusive --time 150:00:00 --pty bash scriptName —login
+#
 
 # Colors
 GREEN='\033[0;32'

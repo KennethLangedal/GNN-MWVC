@@ -1,3 +1,4 @@
 .vscode/
 build/
 results/*
+.start.swp
