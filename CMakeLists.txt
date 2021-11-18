@@ -18,6 +18,7 @@ find_package(OpenMP)
 
 include_directories(include/gnn/)
 include_directories(include/mwvc/)
+include_directories(include/mtx/)
 
 add_executable(GNN_VC_experimental src/apps/GNN_VC_experimental.cpp src/lib/matrix.cpp src/lib/gnn_inference.cpp)
 target_link_libraries(GNN_VC_experimental PRIVATE OpenBLAS::OpenBLAS)
@@ -34,6 +35,13 @@ add_executable(mtx_to_graph src/apps/mtx_to_graph.cpp)
 add_executable(approximation_solver src/apps/approximation_solver.cpp)
 
 add_executable(is_vc_converter src/apps/is_vc_converter.cpp)
+
+add_library(mmio src/mtx/mmio.c)
+add_executable(example_read_c src/mtx/example_read.c)
+target_link_libraries(example_read_c mmio)
+
+add_executable(example_read_cpp src/mtx/example_read.cpp)
+target_link_libraries(example_read_cpp mmio)
 
 add_executable(gnn_training src/apps/gnn_train.cpp src/lib/matrix.cpp src/lib/gnn_inference.cpp src/lib/gnn_training.cpp)
 target_link_libraries(gnn_training PRIVATE OpenBLAS::OpenBLAS)

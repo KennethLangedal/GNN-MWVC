@@ -1,0 +1,1 @@
+./gnn_test_with_filter.sh /global/D1/projects/mtx/suitesparse/ /home/daniels/GNN-MWVC/results 20000M 400000M
