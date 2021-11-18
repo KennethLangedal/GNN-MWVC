@@ -20,12 +20,15 @@ min=$3
 # max size
 max=$4
 
+# filename
+filename=$tgt_folder/$5
+
 echo -e "run for files between ${RED}$min${NC} and ${RED}$max${NC}"
+
+touch $filename
 
 for file in $(find $1 -type f -size +$3 -size -$4 | grep '.mtx'); do
     size=$(numfmt --to=iec-i --suffix=B --format="%.3f" $(stat -c%s "$file"))
     echo -e "$size \t $file"
-    filename=$(basename $file)
-    tgt="$2/$filename.result"
-    ../build/gnn_test ../model/pure_model.txt $file >> $tgt
+    ../build/GNN_VC_experimental ../model/pure_model.txt $file $filename
 done
