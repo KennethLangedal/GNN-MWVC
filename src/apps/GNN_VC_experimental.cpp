@@ -202,7 +202,7 @@ int main(int narg, char **arg) {
 
     reduction_graph<Tn, Tw> g_org = t.g;
 
-    size_t relable_interval = 100;
+    size_t relable_interval = 10;
 
     auto run_test = [&](bool GNN, bool reductions, bool small_solve) {
         auto t1 = chrono::high_resolution_clock::now();
