@@ -10,15 +10,15 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # Prefix
-PRE='weighted_'
+# PRE='weighted_'
 POST='.graph'
 
 # transforms the graph
 function transform_graphs() {
     for path in $1/*.mtx; do
         local filename=$(basename $path)
-        local new_filename="${PRE}${filename}${POST}"
-        local new_path="$2${new_filename}"
+        local new_filename="${filename}${POST}"
+        local new_path="$2/${new_filename}"
         echo -e "${RED}$path${NC} --> $new_path"
         #  "Usage: ./gen_weights [graph] [output graph] [min] [max] [seed]"
         ../build/mtx_to_graph $path $new_path
