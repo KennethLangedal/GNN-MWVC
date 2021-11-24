@@ -16,13 +16,13 @@
 function run() {
     for path in `ls -Sr $1/*.mtx.graph`; do
         filename=$(basename $path)
-        echo "--------------------------------------------------------------------------------"
+        echo "==========================================="
         echo -e $filename
         echo "++++++++++++++++++++++++++++++++" 
         ls -lah $path | awk -F " " {'print $5'}
         echo "++++++++++++++++++++++++++++++++"
         timeout -k 1000s 1000s /home/daniels/KaMIS/build/wmis/branch_reduce $path --output=/home/daniels/GNN-MWVC/results/${filename}.result
-        echo "--------------------------------------------------------------------------------"
+        echo "-------------------------------------------"
     done
 }
 
