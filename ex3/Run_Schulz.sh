@@ -89,10 +89,10 @@ NC='\033[0m'
 src_folder=/global/D1/projects/mtx/suitesparse_weighted
 
 # min size
-min=10k
+min=200M
 
 # max size
-max=20k
+max=2000M
 
 # path to result file
 tgt_file=/home/daniels/GNN-MWVC/results/result_2.txt
