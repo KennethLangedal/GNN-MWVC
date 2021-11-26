@@ -1,1 +1,1 @@
-./Run_FastMWVC.sh /global/D1/projects/mtx/suitesparse_weighted/ 200M 2000M
+./Run_FastWVC.sh /global/D1/projects/mtx/suitesparse_weighted/ 200M 2000M

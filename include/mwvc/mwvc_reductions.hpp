@@ -17,7 +17,7 @@ struct vertex_cover {
     }
 };
 
-constexpr size_t max_small_solve = 12;
+constexpr size_t max_small_solve = 8;
 
 enum class reduction_rules { neighborhood_reduction,
                              twin_fold,
@@ -335,7 +335,7 @@ void reduce_graph(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_se
                 rule++;
             } else {
                 Tn u = gs.pop_search(rule);
-                if (u >= g.size() || !g.is_active(u))
+                if (u >= g.size() || !g.is_active(u) || g.D(u) > 50)
                     continue;
                 bool found = false;
                 switch ((reduction_rules)rule) {

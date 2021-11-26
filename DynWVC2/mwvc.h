@@ -142,6 +142,10 @@ int BuildInstance(string filename)
     for (e = 0; e < e_num; e++)
     {
         infile >> tmp >> v1 >> v2;
+        if (v1 < 1 || v1 > v_num || v2 < 1 || v2 > v_num || v1 == v2) {
+            cout << "Invalid edge " << v1 << "," << v2 << endl;
+            exit(0);
+        }
         v_degree[v1]++;
         v_degree[v2]++;
 

@@ -1,0 +1,84 @@
+/global/D1/projects/mtx/suitesparse_weighted/weighted_12month1.mtx,861519,24.190000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_3Dspectralwave.mtx,41466747,968.340000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_Bump_2911.mtx,186036823,984.220000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_Cube_Coup_dt0.mtx,143327954,984.370000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_Cube_Coup_dt6.mtx,143328334,984.410000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_Emilia_923.mtx,59341691,994.610000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_Flan_1565.mtx,103848814,985.570000
+the number of vertices 23947347 exceeds MAXV 9000000 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_GL7d19.mtx,115110788,984.140000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_GL7d20.mtx,91359899,987.940000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_GL7d21.mtx,53711005,992.950000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_Geo_1438.mtx,93061163,992.320000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_Hook_1498.mtx,89974157,982.560000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_Long_Coup_dt0.mtx,96864959,989.400000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_Long_Coup_dt6.mtx,96869050,987.050000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_ML_Geer.mtx,100550197,986.660000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_PFlow_742.mtx,43672928,991.540000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_RM07R.mtx,18470230,141.910000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_Serena.mtx,89441945,987.290000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_adaptive.mtx,269794142,994.600000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_af_shell10.mtx,97584845,993.470000
+the number of vertices 11950757 exceeds MAXV 9000000 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_audikw_1.mtx,61362725,990.320000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_bone010.mtx,64615579,991.300000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_boneS10.mtx,58817380,986.260000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_cage15.mtx,290772479,987.340000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_channel-500x100x100-b050.mtx,281726742,988.770000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_circuit5M.mtx,25420188,127.380000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_cit-Patents.mtx,118111727,992.350000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_com-LiveJournal.mtx,131309623,984.040000
+the number of edges Success exceeds MAXE 117185082 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_delaunay_n23.mtx,394280463,992.220000
+the number of vertices 16777216 exceeds MAXV 9000000 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_dgreen.mtx,70421550,995.020000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_dielFilterV2real.mtx,72021417,994.010000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_dielFilterV3clx.mtx,27162927,125.990000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_dielFilterV3real.mtx,71324912,898.020000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_eu-2005.mtx,27665945,994.320000
+the number of vertices 50912018 exceeds MAXV 9000000 
+the number of vertices 11548845 exceeds MAXV 9000000 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_hollywood-2009.mtx,58904715,983.910000
+the number of vertices 18318143 exceeds MAXV 9000000 
+the number of vertices 19458087 exceeds MAXV 9000000 
+the number of vertices 21198119 exceeds MAXV 9000000 
+the number of vertices 12057441 exceeds MAXV 9000000 
+the number of vertices 16002413 exceeds MAXV 9000000 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_inline_1.mtx,32585152,361.840000
+the number of vertices 67716231 exceeds MAXV 9000000 
+the number of vertices 55042369 exceeds MAXV 9000000 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_kron_g500-logn19.mtx,9139109,413.350000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_kron_g500-logn20.mtx,17170844,972.770000
+the number of edges Success exceeds MAXE 91040931 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_ldoor.mtx,60980260,992.420000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_ljournal-2008.mtx,163739907,984.430000
+the number of vertices 18571154 exceeds MAXV 9000000 
+the number of vertices 35991342 exceeds MAXV 9000000 
+the number of vertices 68863315 exceeds MAXV 9000000 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_mycielskian17.mtx,3460088,939.580000
+the number of edges Success exceeds MAXE 150466915 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_nlpkkt120.mtx,172864888,988.620000
+the number of edges Success exceeds MAXE 110586256 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_nv2.mtx,88470368,992.420000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_packing-500x100x100-b050.mtx,122648450,995.370000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_patents.mtx,117172398,992.930000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_rgg_n_2_21_s0.mtx,120335642,995.010000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_rgg_n_2_22_s0.mtx,243404673,991.790000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_rgg_n_2_23_s0.mtx,491140870,982.640000
+the number of vertices 14081816 exceeds MAXV 9000000 
+the number of vertices 23947347 exceeds MAXV 9000000 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_soc-LiveJournal1.mtx,151838906,984.720000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_soc-Pokec.mtx,60541592,987.040000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_spal_004.mtx,713895,0.940000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_ss.mtx,95626233,994.420000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_sx-stackoverflow.mtx,44230391,987.790000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_sx-stackoverflow_A2Q.mtx,42743358,993.000000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_vas_stokes_1M.mtx,64582225,993.320000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_vas_stokes_2M.mtx,129123465,987.610000
+the number of edges Success exceeds MAXE 97708521 
+the number of vertices 9845725 exceeds MAXV 9000000 
+/global/D1/projects/mtx/suitesparse_weighted/weighted_wiki-topcats.mtx,55145608,992.290000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_wikipedia-20051105.mtx,42992873,992.560000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_wikipedia-20060925.mtx,78546347,984.650000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_wikipedia-20061104.mtx,82642951,983.650000
+/global/D1/projects/mtx/suitesparse_weighted/weighted_wikipedia-20070206.mtx,93391218,980.950000

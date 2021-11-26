@@ -32,6 +32,7 @@ add_executable(gen_weights src/apps/gen_weights.cpp)
 
 add_executable(mtx_to_graph src/apps/mtx_to_graph.cpp)
 
+add_executable(vc_validate src/apps/vc_validate.cpp)
 
 add_executable(approximation_solver src/apps/approximation_solver.cpp)
 

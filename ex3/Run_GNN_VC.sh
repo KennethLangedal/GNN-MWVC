@@ -27,7 +27,7 @@ echo -e "run for files between ${RED}$min${NC} and ${RED}$max${NC}"
 for file in $(find $1 -type f -size +$2 -size -$3 | grep '.mtx'); do
     size=$(numfmt --to=iec-i --suffix=B --format="%.3f" $(stat -c%s "$file"))
     echo -e "$size \t $file"
-    ../DynMWVC/Converter < $file > $(basename $file ".mtx").mwvc
-    ../DynMWVC/DynMWVC $(basename $file ".mtx").mwvc 0 1000 0 >> res_dyn.txt
-    rm $(basename $file ".mtx").mwvc
+    ../build/GNN_VC $file tmp.sol -1 0 >> res_GNN_VC_V2.txt
+    ../build/vc_validate $file tmp.sol >> res_GNN_VC_validation.txt
+    rm tmp.sol
 done

@@ -78,6 +78,15 @@ void model::predict(const matrix &in, matrix &out, const reduction_graph<Tn, Tw>
     std::swap(in_copy, out);
 }
 
+void model::set_weight_scale(float ws) {
+    for (auto &&l : layers) {
+        std::visit(overloaded{
+                       [&](auto &&l) {},
+                       [&](graph_layer &l) { l.WEIGHT_SCALE = ws; }},
+                   l);
+    }
+}
+
 std::ostream &gnn::operator<<(std::ostream &os, const model &m) {
     os << m.name << std::endl;
     os << m.layers.size() << " Layers" << std::endl;
