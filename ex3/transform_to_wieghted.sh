@@ -30,5 +30,3 @@ tgt_folder=$2
 echo -e "${RED}$src_folder${NC} --> ${RED}$tgt_folder${NC}"
 
 transform_graphs $src_folder $tgt_folder
-
-

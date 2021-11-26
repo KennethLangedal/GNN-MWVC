@@ -1,0 +1,24 @@
+
+A hybrid iterated local search heuristic for the maximum weight independent set problem
+Copyright (c) - 2017
+
+contact author: Bruno Nogueira <nogueirabruno@gmail.com>
+
+-> LITERATURE
+
+A hybrid iterated local search heuristic for the maximum weight independent set problem
+Journal: Optimization Letters
+DOI: 10.1007/s11590-017-1128-7
+
+-> INSTALL
+
+type make to compile the code
+
+-> INPUT FORMAT
+
+See an example instance in the directory test_data
+
+-> COMMAND-LINE USAGE
+
+Type ./ilsvnd -help
+

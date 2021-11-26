@@ -48,6 +48,8 @@ namespace gnn {
 
         void predict(const matrix &in, matrix &out, const reduction_graph<Tn, Tw> &g) const;
 
+        void set_weight_scale(float ws);
+
         friend std::ostream &operator<<(std::ostream &os, const model &m);
         friend std::istream &operator>>(std::istream &is, model &m);
     };
