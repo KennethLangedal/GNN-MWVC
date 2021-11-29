@@ -1,0 +1,89 @@
+weighted_12month1.mtx,4.9807,5.30886,60190699 ,60190699 ,Valid vertex cover, cost: 861519
+weighted_3Dspectralwave.mtx, -, -, -, -,Valid vertex cover, cost: 47645295
+weighted_Bump_2911.mtx,131.642, -, -, -,Valid vertex cover, cost: 203819234
+weighted_Cube_Coup_dt0.mtx,71.5372, -, -, -,Valid vertex cover, cost: 151572689
+weighted_Cube_Coup_dt6.mtx,71.1582, -, -, -,Valid vertex cover, cost: 151572689
+weighted_Emilia_923.mtx,35.9913, -, -, -,Valid vertex cover, cost: 64566426
+weighted_Flan_1565.mtx,62.8787, -, -, -,Valid vertex cover, cost: 109535142
+weighted_GAP-road.mtx,309.467, -, -, -,Valid vertex cover, cost: 1676225758
+weighted_GL7d17.mtx, -, -, -, -,Valid vertex cover, cost: 66879836
+weighted_GL7d18.mtx, -, -, -, -,Valid vertex cover, cost: 108431371
+weighted_GL7d19.mtx,177.249, -, -, -,Valid vertex cover, cost: 136903684
+weighted_GL7d20.mtx,364.917, -, -, -,Valid vertex cover, cost: 133755008
+weighted_GL7d21.mtx,227.155, -, -, -,Valid vertex cover, cost: 100603392
+weighted_Geo_1438.mtx,57.274, -, -, -,Valid vertex cover, cost: 100726706
+weighted_Hardesty3.mtx, -, -, -, -,Valid vertex cover, cost: 531369259
+weighted_Hook_1498.mtx,303.211, -, -, -,Valid vertex cover, cost: 104858768
+weighted_Long_Coup_dt0.mtx,46.1626, -, -, -,Valid vertex cover, cost: 102920123
+weighted_Long_Coup_dt6.mtx,46.165, -, -, -,Valid vertex cover, cost: 102920123
+weighted_ML_Geer.mtx,205.586, -, -, -,Valid vertex cover, cost: 105303064
+weighted_PFlow_742.mtx,63.1132, -, -, -,Valid vertex cover, cost: 51992295
+weighted_RM07R.mtx,4.72737, -, -, -,Valid vertex cover, cost: 26712146
+weighted_Serena.mtx,64.5986, -, -, -,Valid vertex cover, cost: 97356377
+weighted_adaptive.mtx,164.237,166.608,241202155 ,241202155 ,Valid vertex cover, cost: 235946979
+weighted_af_shell10.mtx,37.5494, -, -, -,Valid vertex cover, cost: 105547911
+weighted_asia_osm.mtx,33.3216, -, -, -,Valid vertex cover, cost: 836515085
+weighted_audikw_1.mtx,26.772, -, -, -,Valid vertex cover, cost: 66101395
+weighted_bone010.mtx,33.4373, -, -, -,Valid vertex cover, cost: 69008998
+weighted_boneS10.mtx,28.2146, -, -, -,Valid vertex cover, cost: 64074840
+weighted_cage15.mtx,635.124, -, -, -,Valid vertex cover, cost: 360898778
+weighted_channel-500x100x100-b050.mtx,1142.1, -, -, -,Valid vertex cover, cost: 336100385
+weighted_circuit5M.mtx,3.64173,4.74684,363700923 ,363700923 ,Valid vertex cover, cost: 25408133
+weighted_cit-Patents.mtx,649.076, -, -, -,Valid vertex cover, cost: 264276456
+weighted_com-LiveJournal.mtx,139.399, -, -, -,Valid vertex cover, cost: 279818023
+weighted_com-Orkut.mtx, -, -, -, -,Valid vertex cover, cost: 215028968
+weighted_delaunay_n23.mtx, -, -, -, -,Valid vertex cover, cost: 587238244
+weighted_delaunay_n24.mtx, -, -, -, -,Valid vertex cover, cost: 1174252451
+weighted_dgreen.mtx,449.306, -, -, -,Valid vertex cover, cost: 83995257
+weighted_dielFilterV2real.mtx,32.233, -, -, -,Valid vertex cover, cost: 80992645
+weighted_dielFilterV3clx.mtx,0.99017,1.18234,2293078 ,2293078 ,Valid vertex cover, cost: 27145680
+weighted_dielFilterV3real.mtx,2.76062,3.28085,5906383 ,5906383 ,Valid vertex cover, cost: 71274330
+weighted_eu-2005.mtx,43.5516, -, -, -,Valid vertex cover, cost: 60404120
+weighted_europe_osm.mtx,116.639, -, -, -,Valid vertex cover, cost: 3563913592
+weighted_germany_osm.mtx,14.9826,19.6684,450314095 ,450314095 ,Valid vertex cover, cost: 357909686
+weighted_hollywood-2009.mtx,16.5476,17.283,21007101 ,21007101 ,Valid vertex cover, cost: 58755035
+weighted_hugebubbles-00000.mtx,364.917,447.265,662731419 ,662731419 ,Valid vertex cover, cost: 619519122
+weighted_hugebubbles-00010.mtx, -, -, -, -,Valid vertex cover, cost: 1362261440
+weighted_hugebubbles-00020.mtx, -, -, -, -,Valid vertex cover, cost: 1483685532
+weighted_hugetrace-00010.mtx, -, -, -, -,Valid vertex cover, cost: 844198143
+weighted_hugetrace-00020.mtx, -, -, -, -,Valid vertex cover, cost: 1120207270
+weighted_inline_1.mtx,8.42268, -, -, -,Valid vertex cover, cost: 35269853
+weighted_kmer_U1a.mtx, -, -, -, -,Valid vertex cover, cost: 445363413
+weighted_kmer_V2a.mtx,39.4202,65.4057,2134178192 ,2134178192 ,Valid vertex cover, cost: 1718619660
+weighted_kron_g500-logn19.mtx,10.6248,11.147,27596775 ,27596775 ,Valid vertex cover, cost: 9063903
+weighted_kron_g500-logn20.mtx,26.5972,27.719,56394845 ,56394845 ,Valid vertex cover, cost: 17006984
+weighted_kron_g500-logn21.mtx,62.663,65.0214,114868543 ,114868543 ,Valid vertex cover, cost: 31954006
+weighted_ldoor.mtx,24.3485, -, -, -,Valid vertex cover, cost: 66612881
+weighted_ljournal-2008.mtx,302.909, -, -, -,Valid vertex cover, cost: 375395737
+weighted_mawi_201512012345.mtx,3.00018,6.57068,1272965033 ,1272965033 ,Valid vertex cover, cost: 27084524
+weighted_mawi_201512020000.mtx,5.23779,12.1146,2475040608 ,2475040608 ,Valid vertex cover, cost: 44560527
+weighted_mawi_201512020030.mtx, -, -, -, -,Valid vertex cover, cost: 525468899
+weighted_mycielskian17.mtx,886.386,886.723,3453681 ,3453681 ,Valid vertex cover, cost: 3430834
+weighted_mycielskian18.mtx, -, -, -, -,Valid vertex cover, cost: 13778936
+weighted_nlpkkt120.mtx,129.501,130.407,127041330 ,127041330 ,Valid vertex cover, cost: 121011795
+weighted_nlpkkt160.mtx,358.121,360.601,297443686 ,297443686 ,Valid vertex cover, cost: 286654569
+weighted_nv2.mtx,774.826, -, -, -,Valid vertex cover, cost: 101721308
+weighted_packing-500x100x100-b050.mtx,961.605, -, -, -,Valid vertex cover, cost: 150224985
+weighted_patents.mtx,729.555, -, -, -,Valid vertex cover, cost: 264276456
+weighted_rel9.mtx, -, -, -, -,Valid vertex cover, cost: 19230024
+weighted_relat9.mtx, -, -, -, -,Valid vertex cover, cost: 38435335
+weighted_rgg_n_2_21_s0.mtx,880.65, -, -, -,Valid vertex cover, cost: 146822549
+weighted_rgg_n_2_22_s0.mtx, -, -, -, -,Valid vertex cover, cost: 293583388
+weighted_rgg_n_2_23_s0.mtx, -, -, -, -,Valid vertex cover, cost: 587238244
+weighted_road_central.mtx,184.715, -, -, -,Valid vertex cover, cost: 985732576
+weighted_road_usa.mtx,309.298, -, -, -,Valid vertex cover, cost: 1676225758
+weighted_soc-LiveJournal1.mtx,151.586, -, -, -,Valid vertex cover, cost: 339265510
+weighted_soc-Pokec.mtx,651.653, -, -, -,Valid vertex cover, cost: 114327869
+weighted_spal_004.mtx,568.485,568.904,21827990 ,21827990 ,Valid vertex cover, cost: 713895
+weighted_ss.mtx,615.755, -, -, -,Valid vertex cover, cost: 115695804
+weighted_sx-stackoverflow.mtx,8.07976,9.29689,139456795 ,139456795 ,Valid vertex cover, cost: 42738786
+weighted_sx-stackoverflow_A2Q.mtx,4.21281,5.20305,140744048 ,140744048 ,Valid vertex cover, cost: 41451533
+weighted_vas_stokes_1M.mtx, -, -, -, -,Valid vertex cover, cost: 76319273
+weighted_vas_stokes_2M.mtx, -, -, -, -,Valid vertex cover, cost: 150344955
+weighted_vas_stokes_4M.mtx, -, -, -, -,Valid vertex cover, cost: 306783992
+weighted_wb-edu.mtx,144.988, -, -, -,Valid vertex cover, cost: 689162880
+weighted_wiki-topcats.mtx,297.323, -, -, -,Valid vertex cover, cost: 125366705
+weighted_wikipedia-20051105.mtx,12.2833, -, -, -,Valid vertex cover, cost: 114465454
+weighted_wikipedia-20060925.mtx,25.7696, -, -, -,Valid vertex cover, cost: 208903530
+weighted_wikipedia-20061104.mtx,27.7046, -, -, -,Valid vertex cover, cost: 220402114
+weighted_wikipedia-20070206.mtx,36.104, -, -, -,Valid vertex cover, cost: 249660763

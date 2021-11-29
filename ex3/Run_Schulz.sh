@@ -39,7 +39,7 @@ function transform() {
     tmpfile_result_trans=/tmp/$filename.graph.result.trans 
     
     /home/daniels/GNN-MWVC/build/mtx_to_graph $path $tmpfile_graph
-    result=$(timeout -k 1200s 1200s /home/daniels/KaMIS/build/wmis/branch_reduce $tmpfile_graph --output=$tmpfile_result --time_limit=1200)  
+    result=$(timeout -k 1200s 1200s /home/daniels/KaMIS/build/wmis/branch_reduce $tmpfile_graph --output=$tmpfile_result --time_limit=1200 --reduction_style=dense)  
 
     echo "==========================================="
     echo -e $filename
