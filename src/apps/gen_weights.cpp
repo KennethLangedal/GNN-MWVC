@@ -31,9 +31,10 @@ int main(int narg, char **arg) {
     getline(is, line);
     while (line.front() == '%')
         getline(is, line);
-    size_t N, E, w;
+    size_t N, M, E, w;
     stringstream ss(line);
-    ss >> N >> N >> E;
+    ss >> N >> M >> E;
+    N = std::max(N, M);
 
     vector<pair<uint32_t, uint32_t>> edges;
     vector<uint32_t> weights(N);
