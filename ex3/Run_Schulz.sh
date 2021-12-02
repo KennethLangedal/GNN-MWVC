@@ -39,7 +39,7 @@ function transform() {
     tmpfile_result_trans=/tmp/$filename.graph.result.trans 
     
     /home/daniels/GNN-MWVC/build/mtx_to_graph $path $tmpfile_graph
-    result=$(timeout -k 1200s 1200s /home/daniels/KaMIS/build/wmis/branch_reduce $tmpfile_graph --output=$tmpfile_result --time_limit=1200 --reduction_style=dense)  
+    result=$(timeout -k 1400s 1400s /home/daniels/KaMIS/build/wmis/branch_reduce $tmpfile_graph --output=$tmpfile_result --time_limit=1000 --reduction_style=dense)  
 
     echo "==========================================="
     echo -e $filename
@@ -89,10 +89,10 @@ NC='\033[0m'
 src_folder=/global/D1/projects/mtx/suitesparse_weighted
 
 # min size
-min=200M
+min=200k
 
 # max size
-max=2000M
+max=2000k
 
 # path to result file
 tgt_file=/home/daniels/GNN-MWVC/results/result_2.txt
