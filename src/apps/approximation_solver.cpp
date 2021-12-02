@@ -3,6 +3,7 @@
 #include <iostream>
 #include <optional>
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
@@ -43,11 +44,17 @@ int main(int narg, char **arg) {
     vector<pair<uint32_t, uint32_t>> edges(E);
     for (auto &&[u, v] : edges) {
         is >> u >> v;
+        if (u < 1 || v < 1 || u > N || v > N) {
+            cout << "Invalid edge " << u << "," << v << endl;
+            return 0;
+        }
         if (--u > --v)
             swap(u, v);
     }
     sort(begin(edges), end(edges));
     edges.erase(unique(begin(edges), end(edges)), end(edges));
+
+    auto t1 = chrono::high_resolution_clock::now();
 
     vector<vector<uint32_t>> graph(N), g(N);
 
@@ -66,6 +73,7 @@ int main(int narg, char **arg) {
     }
 
     vector<bool> active(edges.size(), true), vc(N, false), tmp_active(N, false);
+    uint32_t c = 0;
 
     for (size_t i = 0; i < edges.size(); ++i) {
         if (!active[i])
@@ -76,6 +84,7 @@ int main(int narg, char **arg) {
         SW[u] -= SW[k];
         SW[v] -= SW[k];
         vc[k] = true;
+        c += weights[k];
         for (auto j : g[k])
             deactive_weights[j] -= weights[k];
         for (auto j : graph[k])
@@ -84,10 +93,12 @@ int main(int narg, char **arg) {
 
     auto remove_node_from_vc = [&](uint32_t u) {
         vc[u] = false;
+        c -= weights[u];
         for (auto &&v : g[u]) {
             deactive_weights[v] += weights[u];
             if (!vc[v]) {
                 vc[v] = true;
+                c += weights[v];
                 for (auto &&w : g[v]) {
                     deactive_weights[w] -= weights[v];
                 }
@@ -133,9 +144,11 @@ int main(int narg, char **arg) {
         }
     }
 
+    auto t2 = chrono::high_resolution_clock::now();
+
     auto cost = validate(weights, edges, vc);
     if (cost) {
-        cout << "Valid cover, cost: " << *cost << endl;
+        cout << arg[1] << "," << *cost << "," << chrono::duration<double>(t2 - t1).count() << endl;
     } else {
         cout << "Not a valid vertex cover" << endl;
     }

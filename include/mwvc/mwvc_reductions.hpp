@@ -335,7 +335,7 @@ void reduce_graph(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_se
                 rule++;
             } else {
                 Tn u = gs.pop_search(rule);
-                if (u >= g.size() || !g.is_active(u) || g.D(u) > 50)
+                if (u >= g.size() || !g.is_active(u) || g.D(u) > 10)
                     continue;
                 bool found = false;
                 switch ((reduction_rules)rule) {

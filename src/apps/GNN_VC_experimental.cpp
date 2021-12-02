@@ -21,7 +21,7 @@ struct test_graph {
     size_t N, E;
 };
 
-test_graph parse_graph(filesystem::path path) {
+test_graph parse_graph(filesystem::path path, ofstream& os) {
     string name = path.filename().stem();
     ifstream fs(path);
     size_t E, N;
@@ -34,7 +34,7 @@ test_graph parse_graph(filesystem::path path) {
     for (auto &&[u, v] : edges) {
         fs >> u >> v;
         if (u > N || v > N || v == u) {
-            cout << "Bad edge, (" << u << "," << v << ")\n" << endl;
+            os << "Bad edge, (" << u << "," << v << ")\n" << endl;
             exit(0);  
         }
         if (--u > --v)
@@ -114,7 +114,6 @@ vertex_cover<Tn, Tw> gnn_solve(reduction_graph<Tn, Tw> &g, gnn::model &m, size_t
     if (reductions)
         reduce_graph(g, res, gs, g.size() < CRITICAL_LIMIT);
 
-    cout << "Initial reductions done" << endl;
     size_t i = g.size(), N = g.size(), j = 0;
     matrix x, out;
 
@@ -149,7 +148,7 @@ vertex_cover<Tn, Tw> gnn_solve(reduction_graph<Tn, Tw> &g, gnn::model &m, size_t
             }
 
             i = 0;
-            cout << "Testing " << (GNN ? "GNN" : "QUICK") << (reductions ? " with reductions" : "") << (small_solve ? " using small_solve" : "") << ", remaining nodes: " << g.size() << "                    " << flush << (char)13;
+            //cout << "Testing " << (GNN ? "GNN" : "QUICK") << (reductions ? " with reductions" : "") << (small_solve ? " using small_solve" : "") << ", remaining nodes: " << g.size() << "                    " << flush << (char)13;
             j = 0;
         } else if (res.S[g.get_org_label(nodes[i])].has_value() && ((GNN && *res.S[g.get_org_label(nodes[i])] != (out(nodes[i], 0) > 0.5f)) || (!GNN && *res.S[g.get_org_label(nodes[i])]))) {
             mistakes_from_model++;
@@ -201,14 +200,13 @@ int main(int narg, char **arg) {
 
     fs >> m;
 
-    auto t = parse_graph(graph_path);
+    auto t = parse_graph(graph_path, os);
 
-    cout << t.name << ", N = " << t.N << ", E = " << t.E << endl;
     os << t.name << "," << t.N << "," << t.E << "," << std::flush;
 
     reduction_graph<Tn, Tw> g_org = t.g;
 
-    size_t relable_interval = 10;
+    size_t relable_interval = max(10, (int)t.E / 500000);;
 
     auto run_test = [&](bool GNN, bool reductions, bool small_solve) {
         auto t1 = chrono::high_resolution_clock::now();

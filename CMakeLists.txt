@@ -36,6 +36,8 @@ add_executable(vc_validate src/apps/vc_validate.cpp)
 
 add_executable(approximation_solver src/apps/approximation_solver.cpp)
 
+add_executable(fastWVC_tuned src/apps/fastWVC_tuned.cpp)
+
 add_executable(is_vc_converter src/apps/is_vc_converter.cpp)
 
 add_library(mmio src/mtx/mmio.c)

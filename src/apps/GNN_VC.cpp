@@ -1,4 +1,5 @@
 #include "gnn_training.hpp"
+#include "local_search.hpp"
 #include "medium_solve.hpp"
 #include "mwvc_reductions.hpp"
 #include "small_solve.hpp"
@@ -21,6 +22,8 @@ const string model_data = "MWVC_Model\n21 Layers\nGraph_Layer\n\nLinear_Layer\nW
 
 struct test_graph {
     reduction_graph<Tn, Tw> g;
+    vector<Tw> weights;
+    vector<pair<Tn, Tn>> edges;
     string name;
     size_t N, E;
 };
@@ -30,7 +33,7 @@ test_graph parse_graph(filesystem::path path) {
     ifstream fs(path);
     if (!fs.is_open()) {
         cout << "Error opening graph file" << endl;
-        return {reduction_graph<Tn, Tw>({}, {}), name, 0, 0};
+        return {reduction_graph<Tn, Tw>({}, {}), {}, {}, name, 0, 0};
     }
     size_t E, N;
     fs >> E >> N;
@@ -50,8 +53,10 @@ test_graph parse_graph(filesystem::path path) {
             swap(u, v);
     }
     sort(begin(edges), end(edges));
+    edges.erase(unique(begin(edges), end(edges)), end(edges));
+    E = edges.size();
 
-    return {reduction_graph<Tn, Tw>(weights, edges), name, N, E};
+    return {reduction_graph<Tn, Tw>(weights, edges), weights, edges, name, N, E};
 }
 
 bool validate(const reduction_graph<Tn, Tw> &g, const vertex_cover<Tn, Tw> &s) {
@@ -95,8 +100,7 @@ size_t small_solve_dfs(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, gra
             }
         }
         res++;
-        if (component.size() < 75) {
-
+        if (component.size() < 50) {
             medium_solve(g, vc, gs, component);
         }
     }
@@ -129,7 +133,15 @@ vertex_cover<Tn, Tw> gnn_solve(reduction_graph<Tn, Tw> &g, gnn::model &m, bool v
             m.predict(x, out, g);
 
             sort(begin(nodes), begin(nodes) + N, [&](auto &&a, auto &&b) {
-                return min(out(a, 0), 1.0f - out(a, 0)) < min(out(b, 0), 1.0f - out(b, 0));
+                float av = min(out(a, 0), 1.0f - out(a, 0)), bv = min(out(b, 0), 1.0f - out(b, 0)), eps = 0.000001f;
+                if (av < (bv + eps) && av > (bv - eps)) {
+                    if (out(a, 0) < 0.5 && out(b, 0) > 0.5)
+                        return true;
+                    if (out(a, 0) > 0.5 && out(b, 0) > 0.5)
+                        return g.D(a) > g.D(b) || (g.D(a) == g.D(b) && g.W(a) < g.W(b));
+                    return false;
+                }
+                return av < bv;
             });
 
             i = 0;
@@ -156,83 +168,18 @@ vertex_cover<Tn, Tw> gnn_solve(reduction_graph<Tn, Tw> &g, gnn::model &m, bool v
     return res;
 }
 
-void local_search(const test_graph &t, vertex_cover<Tn, Tw> &vc) {
-
-    vector<uint32_t> deactive_weights(t.N, 0);
-    vector<bool> tmp_active(t.N, false);
-
-    for (uint32_t u = 0; u < t.N; ++u) {
-        if (!(*vc.S[u])) {
-            for (auto &&v : t.g[u])
-                deactive_weights[v] += t.g.W(u);
-        }
-    }
-
-    auto remove_node_from_vc = [&](uint32_t u) {
-        vc.S[u] = false;
-        vc.cost -= t.g.W(u);
-        for (auto &&v : t.g[u]) {
-            deactive_weights[v] += t.g.W(u);
-            if (!(*vc.S[v])) {
-                vc.S[v] = true;
-                vc.cost += t.g.W(v);
-                for (auto &&w : t.g[v]) {
-                    deactive_weights[w] -= t.g.W(v);
-                }
-            }
-        }
-    };
-
-    bool improvement = true;
-    while (improvement) {
-        improvement = false;
-        for (size_t u = 0; u < t.N; ++u) {
-            if (!(*vc.S[u])) {
-                uint32_t cost_improvement = 0;
-                for (auto &&v : t.g[u])
-                    tmp_active[v] = true;
-                for (auto &&v : t.g[u]) {
-                    if (!tmp_active[v])
-                        continue;
-                    if (deactive_weights[v] - t.g.W(u) < t.g.W(v)) {
-                        cost_improvement += t.g.W(v) - (deactive_weights[v] - t.g.W(u));
-                        for (auto &&w : t.g[v])
-                            tmp_active[w] = false;
-                    } else {
-                        tmp_active[v] = false;
-                    }
-                }
-                if (cost_improvement > t.g.W(u)) {
-                    improvement = true;
-                    for (auto &&v : t.g[u]) {
-                        if (tmp_active[v]) {
-                            remove_node_from_vc(v);
-                        }
-                    }
-                }
-                for (auto &&v : t.g[u])
-                    tmp_active[v] = false;
-            } else {
-                if (deactive_weights[u] < t.g.W(u)) {
-                    improvement = true;
-                    remove_node_from_vc(u);
-                }
-            }
-        }
-    }
-}
-
 int main(int narg, char **arg) {
 
-    if (narg != 5) {
-        cout << "Usage: ./GNN_VC [graph] [result file] [k (< 0 -> auto)] [0->silent, 1->verbose]" << endl;
+    if (narg != 6) {
+        cout << "Usage: ./GNN_VC [graph] [result file] [time] [k (< 0 = auto)] [0 = silent, 1 = verbose]" << endl;
         return 0;
     }
 
     gnn::model m;
     string graph_path(arg[1]), out_path(arg[2]);
-    int k = stoi(arg[3]);
-    bool verbose = arg[4][0] == '1';
+    double t_max = stod(arg[3]);
+    int k = stoi(arg[4]);
+    bool verbose = arg[5][0] == '1';
     istringstream fs(model_data);
     ofstream os(out_path);
     if (!os.is_open()) {
@@ -255,29 +202,52 @@ int main(int narg, char **arg) {
     m.set_weight_scale(w_max);
 
     if (k < 0)
-        k = max(10, (int)t.E / 500000);
+        k = max(10, (int)t.E / 1000);
 
     if (verbose)
         cout << t.name << ", N = " << t.N << ", E = " << t.E << endl;
 
     reduction_graph<Tn, Tw> g_org = t.g;
 
-    auto t1 = chrono::high_resolution_clock::now();
+    auto t1 = chrono::high_resolution_clock::now(), t2 = t1;
 
     auto res = gnn_solve(t.g, m, verbose, k);
 
-    local_search(t, res);
+    auto tgnn = chrono::high_resolution_clock::now();
+    size_t cost_gnn = res.cost;
+
+    if (verbose) {
+        cout << "GNN-VC done in " << chrono::duration<double>(tgnn - t1).count() << "s, cost: " << res.cost << endl;
+    }
+    t2 = chrono::high_resolution_clock::now();
+
+    local_search ls(t.N, t.E, t.weights, t.edges, res.S);
+
+    size_t step_size = 1 << 16;
+    while (chrono::duration<double>(chrono::high_resolution_clock::now() - t1).count() < t_max) {
+        if (ls.search(step_size)) {
+            t2 = chrono::high_resolution_clock::now();
+            step_size = min(step_size * 2, 1ul << 16);
+            if (verbose)
+                cout << ls.get_best_cost() << " at step size " << step_size << "     " << flush << '\r';
+        } else {
+            step_size = max(step_size / 2, 256ul);
+            if (verbose)
+                cout << ls.get_best_cost() << " at step size " << step_size << "     " << flush << '\r';
+        }
+    }
+    res.cost = ls.get_cover(res.S);
 
     if (!validate(g_org, res)) {
         cout << "Result is not a vertex cover" << endl;
         return 0;
     }
-    auto t2 = chrono::high_resolution_clock::now();
+    auto t3 = chrono::high_resolution_clock::now();
 
     if (verbose)
-        cout << "Vertex cover cost: " << res.cost << ", found in " << chrono::duration<double>(t2 - t1).count() << "s" << endl;
+        cout << "Vertex cover cost: " << res.cost << ", found in " << chrono::duration<double>(t2 - t1).count() << "s, " << chrono::duration<double>(t3 - t1).count() << " total time" << endl;
     else
-        cout << t.name << "," << t.N << "," << t.E << "," << res.cost << "," << chrono::duration<double>(t2 - t1).count() << endl;
+        cout << t.name << "," << t.N << "," << t.E << "," << cost_gnn << "," << chrono::duration<double>(tgnn - t1).count() << "," << res.cost << "," << chrono::duration<double>(t2 - t1).count() << endl;
 
     for (Tn u = 0; u < t.N; ++u) {
         os << (*res.S[u] ? 1 : 0) << endl;
