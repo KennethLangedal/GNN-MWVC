@@ -30,8 +30,14 @@ public:
     std::vector<float>::iterator begin();
     std::vector<float>::iterator end();
 
+    std::vector<float>::iterator begin(size_t i);
+    std::vector<float>::iterator end(size_t i);
+
     std::vector<float>::const_iterator begin() const;
     std::vector<float>::const_iterator end() const;
+
+    std::vector<float>::const_iterator begin(size_t i) const;
+    std::vector<float>::const_iterator end(size_t i) const;
 
     friend void dot(const matrix &A, const matrix &B, matrix &C, bool at, bool bt, float beta);
 };

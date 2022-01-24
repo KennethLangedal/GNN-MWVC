@@ -59,12 +59,28 @@ std::vector<float>::iterator matrix::end() {
     return std::begin(data) + (selected_row.has_value() ? get_width() * (*selected_row + 1) : data.size());
 }
 
+std::vector<float>::iterator matrix::begin(size_t i) {
+    return std::begin(data) + (get_width() * i);
+}
+
+std::vector<float>::iterator matrix::end(size_t i) {
+    return std::begin(data) + (get_width() * (i + 1));
+}
+
 std::vector<float>::const_iterator matrix::begin() const {
     return std::begin(data) + (selected_row.has_value() ? get_width() * (*selected_row) : 0);
 }
 
 std::vector<float>::const_iterator matrix::end() const {
     return std::begin(data) + (selected_row.has_value() ? get_width() * (*selected_row + 1) : data.size());
+}
+
+std::vector<float>::const_iterator matrix::begin(size_t i) const {
+    return std::begin(data) + (get_width() * i);
+}
+
+std::vector<float>::const_iterator matrix::end(size_t i) const {
+    return std::begin(data) + (get_width() * (i + 1));
 }
 
 std::ostream &operator<<(std::ostream &os, const matrix &m) {

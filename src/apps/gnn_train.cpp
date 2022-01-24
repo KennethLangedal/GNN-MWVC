@@ -9,7 +9,7 @@ using namespace std;
 using Tn = uint32_t;
 using Tw = uint32_t;
 
-float WEIGHT_SCALE = 1200.0f;
+float WEIGHT_SCALE = 2000.0f;
 
 reduction_graph<Tn, Tw> parse_graph(ifstream &fs) {
     uint64_t E, N;
@@ -33,7 +33,7 @@ vector<pair<pair<matrix, reduction_graph<Tn, Tw>>, matrix>> load_data(filesystem
     vector<pair<pair<matrix, reduction_graph<Tn, Tw>>, matrix>> res;
 
     for (auto &&graph_entry : filesystem::directory_iterator{labels_path}) {
-        cout << graph_path / (graph_entry.path().filename().stem().string() + ".mtx") << endl;
+        // cout << graph_path / (graph_entry.path().filename().stem().string() + ".mtx") << endl;
         ifstream fs_g(graph_path / (graph_entry.path().filename().stem().string() + ".mtx"));
         auto &&g = parse_graph(fs_g);
         matrix x(g.size(), 1);
@@ -43,12 +43,18 @@ vector<pair<pair<matrix, reduction_graph<Tn, Tw>>, matrix>> load_data(filesystem
         ifstream fs_l(graph_entry.path());
         matrix y(g.size(), 1);
         float v;
+        size_t tc = 0, fc = 0;
         for (Tn u = 0; u < g.size(); ++u) {
             fs_l >> v;
+            if (v < 0.5f)
+                fc++;
+            else
+                tc++;
             y(u, 0) = v;
         }
 
-        res.push_back({{x, g}, y});
+        if (tc > g.size() * 0.2f && fc > g.size() * 0.2f)
+            res.push_back({{x, g}, y});
     }
     return res;
 }
@@ -58,12 +64,12 @@ struct performance {
 };
 
 ostream &operator<<(ostream &os, const performance &p) {
-    os << setw(7) << setfill('0') << p.loss << "\t\t" << setw(7) << setfill('0') << p.total_accuracy * 100.0f << "\t\t" << setw(7) << setfill('0') << (size_t)p.num_total << "\t\t" << setw(7) << setfill('0') << p.true_accuracy * 100.0f << "\t\t" << setw(7) << setfill('0') << (size_t)p.num_true << "\t\t";
+    os << p.loss << "," << p.total_accuracy * 100.0f << "," << (size_t)p.num_total << "," << p.true_accuracy * 100.0f << "," << (size_t)p.num_true << ",";
     return os;
 }
 
 template <typename It>
-performance run_model(gnn::model_training &m, It first, It last, bool fit = false, size_t batch_size = 10000, float lr = 0.1f, float momentum = 0.9f, float wd = 0.0000f) {
+performance run_model(gnn::model_training &m, It first, It last, bool fit = false, size_t batch_size = 500000, float lr = 0.01f, float momentum = 0.9f, float wd = 0.0000f) {
     performance res;
     int t = 0;
     matrix out, grad;
@@ -105,13 +111,13 @@ performance run_model(gnn::model_training &m, It first, It last, bool fit = fals
 }
 
 int main(int narg, char **arg) {
-    if (narg != 7) {
-        cout << "Usage: ./gnn_train [graph path] [train labels] [test labels] [out path] [number of epochs] [seed]" << endl;
+    if (narg != 6) {
+        cout << "Usage: ./gnn_train [graph path] [label path] [out path] [number of epochs] [seed]" << endl;
         return 0;
     }
 
-    string graph_path(arg[1]), train_label_path(arg[2]), test_label_path(arg[3]), out_path(arg[4]);
-    size_t ne = stoi(arg[5]);
+    string graph_path(arg[1]), label_path(arg[2]), out_path(arg[3]);
+    size_t ne = stoi(arg[4]);
     ofstream os(out_path);
     if (!os.is_open()) {
         cout << "Unable to open file at out path" << endl;
@@ -119,7 +125,7 @@ int main(int narg, char **arg) {
     }
 
     gnn::model_training m("MWVC_Model");
-    size_t seed = stoi(arg[6]);
+    size_t seed = stoi(arg[5]);
     m.add_layer(gnn::graph_layer_training(WEIGHT_SCALE));
     m.add_layer(gnn::linear_layer_training(5, 32, seed++));
     m.add_layer(gnn::ReLU_training());
@@ -144,20 +150,25 @@ int main(int narg, char **arg) {
 
     cout << fixed << setprecision(4);
 
-    cout << "Train data: " << endl;
-    auto &&train_data = load_data(graph_path, train_label_path);
-    cout << "Test data: " << endl;
-    auto &&test_data = load_data(graph_path, test_label_path);
-
-    cout << "Epoch\tLoss\t\tAccuracy\tTotal\t\tTrue accuracy\tTrue total\tTest loss\tTest accuracy\tTest total\tTest true acc\tTest true total" << endl;
-
     mt19937 reng(seed);
+
+    auto train_data = load_data(graph_path, label_path);
+    vector<pair<pair<matrix, reduction_graph<Tn, Tw>>, matrix>> test_data;
+    shuffle(begin(train_data), end(train_data), reng);
+    size_t train_split = train_data.size() * 0.9;
+    copy(begin(train_data) + train_split, end(train_data), back_inserter(test_data));
+    train_data.erase(begin(train_data) + train_split, end(train_data));
+
+    cout << "Training graphs: " << train_data.size() << ", Test graphs: " << test_data.size() << endl;
+
+    cout << "Epoch,Loss,Accuracy,Total,True accuracy,True total,Test loss,Test accuracy,Test total,Test true acc,Test true total" << endl;
+
     for (int e = 0; e <= ne; e++) {
         shuffle(begin(train_data), end(train_data), reng);
         auto p_train = run_model(m, begin(train_data), end(train_data), true);
         auto p_test = run_model(m, begin(test_data), end(test_data), false);
         if (e % 1 == 0)
-            cout << e << "\t" << p_train << p_test << endl;
+            cout << e << "," << p_train << p_test << endl;
     }
 
     os << m;

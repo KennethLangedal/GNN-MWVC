@@ -94,14 +94,32 @@ void model_training::predict(const matrix &in, matrix &out, const reduction_grap
 void model_training::backprop(const matrix &grad_in, matrix &grad_out, const reduction_graph<Tn, Tw> &g) const {
     assert(!layers.empty());
 
+    // in_copy.resize(grad_in.get_height(), grad_in.get_width());
+    // std::copy(std::begin(grad_in.raw()), std::end(grad_in.raw()), std::begin(in_copy.raw()));
+
+    // for (auto &&l : layers) {
+    //     std::visit(overloaded{
+    //                    [&](const auto &l) { l.backward(in_copy, grad_out); },
+    //                    [&](const graph_layer_training &l) { l.backward(in_copy, grad_out, g); }},
+    //                l);
+    //     std::swap(in_copy, grad_out);
+    // }
+    // std::swap(in_copy, grad_out);
+
     in_copy.resize(grad_in.get_height(), grad_in.get_width());
     std::copy(std::begin(grad_in.raw()), std::end(grad_in.raw()), std::begin(in_copy.raw()));
 
-    for (auto &&l : layers) {
+    std::visit(overloaded{
+                   [&](auto &&l) { l.backward(in_copy, grad_out); },
+                   [&](const graph_layer_training &l) { l.backward(in_copy, grad_out, g); }},
+               layers.back());
+    std::swap(in_copy, grad_out);
+
+    for (int i = layers.size() - 2; i >= 0; i--) {
         std::visit(overloaded{
-                       [&](const auto &l) { l.backward(in_copy, grad_out); },
-                       [&](const graph_layer_training &l) { l.backward(in_copy, grad_out, g); }},
-                   l);
+                       [&](auto &&l, auto &&prev) { l.backward(in_copy, grad_out); },
+                       [&](const graph_layer_training &l, auto &&prev) { l.backward(in_copy, grad_out, g); }},
+                   layers[i], layers[i + 1]);
         std::swap(in_copy, grad_out);
     }
     std::swap(in_copy, grad_out);

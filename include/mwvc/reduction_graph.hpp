@@ -77,6 +77,9 @@ public:
 
     typename std::vector<Tn>::const_iterator begin() const;
     typename std::vector<Tn>::const_iterator end() const;
+
+    typename std::vector<Tn>::const_iterator begin(Tn u) const;
+    typename std::vector<Tn>::const_iterator end(Tn u) const;
 };
 
 template <typename Tn, typename Tw>
@@ -600,4 +603,16 @@ template <typename Tn, typename Tw>
 typename std::vector<Tn>::const_iterator reduction_graph<Tn, Tw>::end() const {
     assert(selected_node >= 0 && selected_node < N);
     return std::begin(edges) + neighborhood_range[selected_node].second;
+}
+
+template <typename Tn, typename Tw>
+typename std::vector<Tn>::const_iterator reduction_graph<Tn, Tw>::begin(Tn u) const {
+    assert(u >= 0 && u < N);
+    return std::begin(edges) + neighborhood_range[u].first;
+}
+
+template <typename Tn, typename Tw>
+typename std::vector<Tn>::const_iterator reduction_graph<Tn, Tw>::end(Tn u) const {
+    assert(u >= 0 && u < N);
+    return std::begin(edges) + neighborhood_range[u].second;
 }

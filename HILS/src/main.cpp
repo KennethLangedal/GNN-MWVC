@@ -124,7 +124,8 @@ int main(int argc, char *argv[])
 
 		BossaTimer input_timer, proc_timer;
 		double target_time = -1;
-		double max_time = 1000;
+		double max_time;
+		cin >> max_time;
 		int target_iterations = -1;
 		input_timer.start();
 

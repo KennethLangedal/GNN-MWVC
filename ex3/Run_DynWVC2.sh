@@ -24,17 +24,17 @@ max=$3
 
 echo -e "run for files between ${RED}$min${NC} and ${RED}$max${NC}"
 
-skip=0
+step=0
 
 for file in $(find $1 -type f -size +$2 -size -$3 | grep '.mtx'); do
-    if [ $skip -lt 59 ]
+    if [ $step -lt 9 ]
     then
-        ((skip++))
+        ((step++))
         continue
     fi
     size=$(numfmt --to=iec-i --suffix=B --format="%.3f" $(stat -c%s "$file"))
     echo -e "$size \t $file"
     ../DynWVC2/Converter < $file > $(basename $file ".mtx").mwvc
-    ../DynWVC2/DynWVC2 $(basename $file ".mtx").mwvc 0 1000 0 >> res_dyn2.txt
+    ../DynWVC2/DynWVC2 $(basename $file ".mtx").mwvc 0 1000 0 >> res_dyn2_1_200.txt
     rm $(basename $file ".mtx").mwvc
 done

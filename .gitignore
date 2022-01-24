@@ -1,4 +1,13 @@
 .vscode/
 build/
+comp_timed/
+plot_results/
+ex3/
+notes.txt
+FastWVC/
+DynWVC2/
+HILS/
+NuMWVC/
+model/
 results/*
 .start.swp

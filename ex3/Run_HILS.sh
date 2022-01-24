@@ -27,5 +27,5 @@ echo -e "run for files between ${RED}$min${NC} and ${RED}$max${NC}"
 for file in $(find $1 -type f -size +$2 -size -$3 | grep '.mtx'); do
     size=$(numfmt --to=iec-i --suffix=B --format="%.3f" $(stat -c%s "$file"))
     echo -e "$size \t $file"
-    ../HILS/ilsvnd -v $file >> res_hils.txt
+    ../HILS/ilsvnd -v $file >> res_hils_1_200.txt
 done

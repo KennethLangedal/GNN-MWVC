@@ -28,6 +28,6 @@ for file in $(find $1 -type f -size +$2 -size -$3 | grep '.mtx'); do
     size=$(numfmt --to=iec-i --suffix=B --format="%.3f" $(stat -c%s "$file"))
     echo -e "$size \t $file"
     ../DynWVC2/Converter < $file > $(basename $file ".mtx").mwvc_fast
-    ../FastWVC/FastWVC $(basename $file ".mtx").mwvc_fast 0 1000 0 >> res_fast.txt
+    ../FastWVC/FastWVC $(basename $file ".mtx").mwvc_fast 0 1000 0 >> res_fast_1_200.txt
     rm $(basename $file ".mtx").mwvc_fast
 done

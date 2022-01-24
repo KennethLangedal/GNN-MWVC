@@ -28,14 +28,16 @@ void graph_layer::forward(const matrix &in, matrix &out, const reduction_graph<T
     out.resize(in.get_height(), (in.get_width() * 2) + 3);
     std::fill(std::begin(out.raw()), std::end(out.raw()), 0.0);
 
+#pragma omp parallel for
     for (Tn u = 0; u < g.size(); u++) {
-        for (auto &&v : g[u]) {
-            std::transform(std::begin(in[v]), std::end(in[v]), std::begin(out[u]), std::begin(out[u]), std::plus());
+        for (auto it = g.begin(u); it != g.end(u); ++it) {
+            Tn v = *it;
+            std::transform(in.begin(v), in.end(v), out.begin(u), out.begin(u), std::plus());
         }
-        std::copy(std::begin(in[u]), std::end(in[u]), std::begin(out[u]) + in.get_width());
-        *(std::begin(out[u]) + in.get_width() + 1) = (float)g.D(u);
-        *(std::begin(out[u]) + in.get_width() + 2) = (float)g.W(u) / WEIGHT_SCALE;
-        *(std::begin(out[u]) + in.get_width() + 3) = (float)g.NW(u) / WEIGHT_SCALE;
+        std::copy(in.begin(u), in.end(u), out.begin(u) + in.get_width());
+        *(out.begin(u) + in.get_width() + 1) = (float)g.D(u);
+        *(out.begin(u) + in.get_width() + 2) = (float)g.W(u) / WEIGHT_SCALE;
+        *(out.begin(u) + in.get_width() + 3) = (float)g.NW(u) / WEIGHT_SCALE;
     }
 }
 

@@ -27,7 +27,7 @@ echo -e "run for files between ${RED}$min${NC} and ${RED}$max${NC}"
 for file in $(find $1 -type f -size +$2 -size -$3 | grep '.mtx'); do
     size=$(numfmt --to=iec-i --suffix=B --format="%.3f" $(stat -c%s "$file"))
     echo -e "$size \t $file"
-    ../build/GNN_VC $file tmp.sol -1 0 >> res_GNN_VC_V2.txt
-    ../build/vc_validate $file tmp.sol >> res_GNN_VC_validation.txt
-    rm tmp.sol
+    ../build/GNN_VC $file tmp_gnn.sol 1000 -1 0 >> res_GNN_VC_1_200_TIMED.txt
+    ../build/vc_validate $file tmp_gnn.sol >> res_GNN_VC_1_200_TIMED_validation.txt
+    rm tmp_gnn.sol
 done

@@ -37,6 +37,8 @@ struct graph_search {
 
     size_t num_local_reduction_rules = 7;
 
+    size_t label_count = 0;
+
     graph_search(Tn N, size_t rules = 7)
         : visited(rules, std::vector<bool>(N, false)), search(rules), num_local_reduction_rules(rules) {
         for (size_t r = 0; r < num_local_reduction_rules; r++)
@@ -98,6 +100,7 @@ void select_neighborhood(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, g
     Tn u_org = g.get_org_label(u), v_org;
     assert(vc.S[u_org] == std::nullopt);
     vc.S[u_org] = false;
+    gs.label_count += g.D(u);
     for (auto &&v : g[u]) {
         v_org = g.get_org_label(v);
         assert(vc.S[v_org] == std::nullopt);
@@ -117,6 +120,7 @@ template <typename Tn, typename Tw>
 void select_node(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_search<Tn> &gs, Tn u) {
     Tn u_org = g.get_org_label(u);
     assert(vc.S[u_org] == std::nullopt);
+    gs.label_count++;
     vc.S[u_org] = true;
     vc.cost += g.W(u);
     for (auto &&v : g[u])
@@ -253,6 +257,7 @@ bool independent_fold(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, grap
     Tn min_neighbor = *std::min_element(std::begin(g[u]), std::end(g[u]), [&](auto &&a, auto &&b) { return g.W(a) < g.W(b); });
     if (g.W(u) >= g.NW(u) - g.W(min_neighbor)) {
         if (g.has_independent_neighbors(u)) { // could be u and none of N(u)
+            gs.label_count += g.D(u);
             vc.r6 += g.D(u);
             vc.cost += g.W(u);
             g.fold_neighborhood(u);
@@ -280,6 +285,7 @@ bool isolated_fold(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_s
                 gs.push_search(w);
         }
         vc.r7 += 1;
+        gs.label_count++;
         return true;
     }
     return false;
@@ -335,7 +341,7 @@ void reduce_graph(reduction_graph<Tn, Tw> &g, vertex_cover<Tn, Tw> &vc, graph_se
                 rule++;
             } else {
                 Tn u = gs.pop_search(rule);
-                if (u >= g.size() || !g.is_active(u) || g.D(u) > 10)
+                if (u >= g.size() || !g.is_active(u) || g.D(u) > 20)
                     continue;
                 bool found = false;
                 switch ((reduction_rules)rule) {

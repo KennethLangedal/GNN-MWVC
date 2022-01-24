@@ -26,6 +26,8 @@ target_link_libraries(GNN_VC_experimental PRIVATE OpenBLAS::OpenBLAS)
 add_executable(GNN_VC src/apps/GNN_VC.cpp src/lib/matrix.cpp src/lib/gnn_inference.cpp)
 target_link_libraries(GNN_VC PRIVATE OpenBLAS::OpenBLAS)
 
+add_executable(QUICK_VC src/apps/QUICK_VC.cpp)
+
 add_executable(gen_reduced_graph src/apps/gen_reduced_graph.cpp)
 
 add_executable(gen_weights src/apps/gen_weights.cpp)
