@@ -7,11 +7,11 @@ By Kenneth Langedal, Johannes Langguth, Fredrik Manne, and Daniel Thilo Schroede
 ## Update April 2025
 
 This repository was updated in April 2025 to make the heuristic easier to use and reproduce results from the paper or to compare for further developments of MWVC or MWIS programs. It includes the source code for the following heuristics:
-* GNN_VC [Efficient Minimum Weight Vertex Cover Heuristics Using Graph Neural Networks, In Proceedings of the 20th International Symposium on Experimental Algorithms (SEA), 2022]
-* NuMWVC [NuMWVC: A Novel Local Search for Minimum Weighted Vertex Cover Problem, In the Journal of the Operational Research Society, 2020]
-* FastWVC [Towards Faster Local Search for Minimum Weight Vertex Cover on Massive Graphs, In the Journal of Information Sciences, 2019]
-* DynWVC2 [Improving Local Search for Minimum Weight Vertex Cover by Dynamic Strategies, In Proceedings of the 27th International Joint Conference on Artificial Intelligence (IJCAI), 2018]
-* HILS [A Hybrid Iterated Local Search Heuristic for the Maximum Weight Independent Set Problem, In the Journal Optimization Letters, 2017]
+* **GNN_VC** [Efficient Minimum Weight Vertex Cover Heuristics Using Graph Neural Networks, In Proceedings of the 20th International Symposium on Experimental Algorithms (SEA), 2022]
+* **NuMWVC** [NuMWVC: A Novel Local Search for Minimum Weighted Vertex Cover Problem, In the Journal of the Operational Research Society, 2020]
+* **FastWVC** [Towards Faster Local Search for Minimum Weight Vertex Cover on Massive Graphs, In the Journal of Information Sciences, 2019]
+* **DynWVC2** [Improving Local Search for Minimum Weight Vertex Cover by Dynamic Strategies, In Proceedings of the 27th International Joint Conference on Artificial Intelligence (IJCAI), 2018]
+* **HILS** [A Hybrid Iterated Local Search Heuristic for the Maximum Weight Independent Set Problem, In the Journal Optimization Letters, 2017]
 
 All the heuristics have been modified to accept the same graph format, as described below. Note that HILS computes an independent set rather than a vertex cover. To compare results, subtract the weight of the independent set from the total sum of weights in the graph.
 
