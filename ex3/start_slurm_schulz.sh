@@ -1,1 +1,0 @@
-./Run_Schulz.sh
