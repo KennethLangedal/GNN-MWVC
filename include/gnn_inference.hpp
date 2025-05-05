@@ -2,6 +2,7 @@
 #include "matrix.hpp"
 #include "reduction_graph.hpp"
 #include <variant>
+#include <cstdint>
 
 namespace gnn {
     using Tw = uint32_t;
